@@ -307,8 +307,8 @@ def extract_frames(video_path, output_folder):
 @click.option('--output_directory', '-od', required=True, help="Directory that output will be saved to under the format of '{output_directory}/Saved_Clips_{method}'")
 @click.option('--method', '-m', default='none', help="Method that you want for the video to be processed with")
 @click.option('--duration', '-d', default=2, help="Duration of the clips for the cells that will be looked at. Example, 1 second duration means get 0.5 seconds before timestamp and 0.5 seconds after timestamp.")
-@click.option('--tolerance', '-t', default=30, help="Tolerance 'threshold' for what is to be considered a similar frame. Example, 10% similar frame will be 0.1 and mean that you consider frames with a mean that are within +/- 10% similar to one another.")
-@click.option('--threshold_value', '-tv', default=0.1, help="Threshold value for thresholding images; above this value will be white, below black ")
+@click.option('--tolerance', '-t', default=0.1, help="Tolerance 'threshold' for what is to be considered a similar frame. Example, 10% similar frame will be 0.1 and mean that you consider frames with a mean that are within +/- 10% similar to one another.")
+@click.option('--threshold_value', '-tv', default=30, help="Threshold value for thresholding images; above this value will be white, below black ")
 @click.option('--extract_frames_flag', '-ef', is_flag=True, default=False, help="Save all of the frames of the outputted clips into a subfolder")
 def process_videos(date_directory, output_directory, method, duration, tolerance, threshold_value, extract_frames_flag):
     """

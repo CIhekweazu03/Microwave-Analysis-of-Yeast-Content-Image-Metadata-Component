@@ -5,6 +5,7 @@ import os
 import pandas as pd
 import numpy as np
 import math
+import time
 
 # if the files are all consistent with how they are recorded, I could make the crop values permanent
 # everything should have the same resolution
@@ -75,6 +76,9 @@ def subtract_similar(video_path, output_path, timestamp, duration, tolerance):
 
     # Write the processed frames to the output video
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # Create the output folder if it doesn't exist
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     out = cv2.VideoWriter(output_path, fourcc, fps, (int(cap.get(3)), int(cap.get(4))))
     for frame in processed_frames:
         out.write(frame)
@@ -141,6 +145,9 @@ def subtract_threshold(video_path, output_path, timestamp, duration, tolerance, 
 
     # Write the processed frames to the output video
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # Create the output folder if it doesn't exist
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     out = cv2.VideoWriter(output_path, fourcc, fps, (int(cap.get(3)), int(cap.get(4))))
     for frame in processed_frames:
         out.write(frame)
@@ -209,6 +216,9 @@ def subtract_threshold_full_video(video_path, output_path, tolerance, threshold_
 
     # Write the processed frames to the output video
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # Create the output folder if it doesn't exist
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     out = cv2.VideoWriter(output_path, fourcc, fps, (int(cap.get(3)), int(cap.get(4))))
     for idx, frame in enumerate(processed_frames):
         out.write(frame)
@@ -234,7 +244,7 @@ def clip_at_timestamp(video_path, output_path, timestamp, method, duration, tole
     if method == 'subtract_similar':
         subtract_similar(video_path, output_path, timestamp, duration)
     elif method == 'subtract_threshold':
-        subtract_threshold(video_path, output_path, timestamp, duration)
+        subtract_threshold(video_path, output_path, timestamp, duration, tolerance, threshold_value)
     elif method == "subtract_threshold_full_video":
         subtract_threshold_full_video(video_path, output_path, tolerance, threshold_value)
     else:
@@ -266,8 +276,10 @@ def extract_frames(video_path, output_folder):
     - video_path (str): Path to the input video.
     - output_path (str): Base Output folder that will contain the subfolder to save the extracted frames.
     """
+    video_name = str(os.path.basename(video_path))
+    video_name = "/" + video_name[:-4]
+    output_path = output_folder + video_name
     # Create the output folder if it doesn't exist
-    output_path = output_folder + str(os.path.basename)
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
@@ -291,13 +303,14 @@ def extract_frames(video_path, output_folder):
     print(f"Extracted {frame_count} frames to {output_path}")
 
 @click.command()
-@click.option('--date_directory', '-dd', help="Date directory that contains Dead Phase subfolder and videos under the format 'Test {test_number}/video_log.avi'")
-@click.option('--output_directory', '-od', help="Directory that output will be saved to under the format of '{output_directory}/Saved_Clips_{method}'")
+@click.option('--date_directory', '-dd', required=True, help="Date directory that contains Dead Phase subfolder and videos under the format 'Test {test_number}/video_log.avi'")
+@click.option('--output_directory', '-od', required=True, help="Directory that output will be saved to under the format of '{output_directory}/Saved_Clips_{method}'")
 @click.option('--method', '-m', default='none', help="Method that you want for the video to be processed with")
 @click.option('--duration', '-d', default=2, help="Duration of the clips for the cells that will be looked at. Example, 1 second duration means get 0.5 seconds before timestamp and 0.5 seconds after timestamp.")
 @click.option('--tolerance', '-t', default=30, help="Tolerance 'threshold' for what is to be considered a similar frame. Example, 10% similar frame will be 0.1 and mean that you consider frames with a mean that are within +/- 10% similar to one another.")
 @click.option('--threshold_value', '-tv', default=0.1, help="Threshold value for thresholding images; above this value will be white, below black ")
-def process_videos(date_directory, output_directory, method, duration, tolerance, threshold_value):
+@click.option('--extract_frames_flag', '-ef', is_flag=True, default=False, help="Save all of the frames of the outputted clips into a subfolder")
+def process_videos(date_directory, output_directory, method, duration, tolerance, threshold_value, extract_frames_flag):
     """
     Main function for processing videos.
     Example Command:
@@ -321,8 +334,12 @@ def process_videos(date_directory, output_directory, method, duration, tolerance
             
             # Clip the video at the specified timestamp
             clip_at_timestamp(video_path, output_path, seconds, method, duration, tolerance, threshold_value)
-            print(f"Completed: Date: {date_directory}, Test: {test_number}, Cell: {cell_number}")
-
+            print(f"Completed: Date: {date_directory}, Test: {test_number}, Cell: {cell_number}. Saved at {output_path}.")
+    
+    # extract_frames is set up in this way so that the videos can fully process and get saved before attempting to get their frames.
+    if (extract_frames_flag == True):
+        for _, row in df.iterrows():
+            extract_frames(output_path, output_directory)
 
 if __name__ == "__main__":
     process_videos()

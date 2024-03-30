@@ -295,6 +295,17 @@ def extract_frames(video_path, output_folder):
         if ret:
             frame_path = os.path.join(output_path, f"frame_{frame_count:05d}.jpeg")
             cv2.imwrite(frame_path, frame)
+            image = cv2.imread(frame_path)
+            height, width, channels = image.shape
+            """
+            This can definitely be modified and experimented width depending on the consistency of the videos.
+            The issue with cropping at the moment is that some videos, even in the same set, are not consistent with where the sensor is so any specific measurement at the moment doesn't work. 
+            """
+            fraction_of_width = .2*width
+            left_bound_width = int(fraction_of_width)
+            right_bound_width = int(1-fraction_of_width)
+            cropped_image = image[0:height, left_bound_width:right_bound_width]
+            cv2.imwrite(frame_path, cropped_image)
             frame_count += 1
         else:
             break
@@ -375,6 +386,8 @@ def process_videos(input_directory, output_directory, method, duration, toleranc
                 output_filename = f"set{set_number}_cell{cell_id}.mp4"
                 output_path = os.path.join(output_directory, output_filename)
                 extract_frames(output_path, output_directory)
+
+
 
 if __name__ == "__main__":
     process_videos()

@@ -41,3 +41,8 @@ Currently, the code uses the Python click module for a CLI; the options for the 
 
                                 
 --help                          Show this message and exit.
+
+## Next Steps
+* With the lighting not being an issue in future videos, experiment with simply averaging each pixel’s values for the video rather than the current process of finding all similar frames and subtracting the average for all similar frames.
+* Video stabilization with a module such as 'vidstab.'
+* Cropping the video before any processing (currently tricky due to inconsistency with sensor location).

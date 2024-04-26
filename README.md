@@ -44,5 +44,6 @@ Currently, the code uses the Python click module for a CLI; the options for the 
 
 ## Next Steps
 * With the lighting not being an issue in future videos, experiment with simply averaging each pixel’s values for the video rather than the current process of finding all similar frames and subtracting the average for all similar frames.
-* Video stabilization with a module such as 'vidstab.'
+* Video stabilization with a module such as 'vidstab.' The vidstab module is great and was built with OpenCV https://pypi.org/project/vidstab/ There may be other modules to look into though.
+*      Example command: python3 -m vidstab --input input_video.mov --output stable_video.avi
 * Cropping the video before any processing (currently tricky due to inconsistency with sensor location).

@@ -16,7 +16,7 @@ Currently, the code uses the Python click module for a CLI; the options for the 
 
                                 
 -m, --method TEXT               Method that you want for the video to be
-                                processed with
+                                processed with. (Note: subtract_threshold is currently the best, but takes a while.)
 
                                 
 -d, --duration INTEGER          Duration of the clips for the cells that
